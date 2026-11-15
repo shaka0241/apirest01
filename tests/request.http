@@ -1,7 +1,10 @@
+# Variable de entorno leída por la extensión REST Client de VS Code.
 @baseUrl = {{$dotenv API_URL}}
+# Sustituye este ejemplo por un _id existente en tu base de datos para probar rutas por ID.
 @productId = 6af9e3704de152f49a042297
 
 ### 1. Crear un nuevo producto (POST)
+# El JSON es el cuerpo de la petición que recibirá req.body en el controlador.
 POST {{baseUrl}}
 Content-Type: application/json
 
@@ -14,14 +17,17 @@ Content-Type: application/json
 }
 
 ### 2. Obtener todos los productos (GET)
+# Consulta la colección completa de productos.
 GET {{baseUrl}}
 Accept: application/json
 
 ### 3. Obtener un producto concreto por ID (GET)
+# La variable productId se inserta en el segmento dinámico de la ruta.
 GET {{baseUrl}}/{{productId}}
 Accept: application/json
 
 ### 4. Actualizar un producto existente (PUT)
+# Este controlador actualiza solo los campos enviados mediante findByIdAndUpdate.
 PUT {{baseUrl}}/{{productId}}
 Content-Type: application/json
 
@@ -31,10 +37,13 @@ Content-Type: application/json
 }
 
 ### 5. Eliminar un producto (DELETE)
+# Prueba la eliminación de un documento existente.
 DELETE {{baseUrl}}/{{productId}}
 
 ### 6. Prueba de Error 404 (Ruta inexistente)
+# Comprueba la respuesta del middleware notFound para un endpoint no registrado.
 GET https://apirest01.vercel.app/api/ruta-falsa
 
 ### 7. Prueba de Error 400/500 (ID con formato inválido)
+# Comprueba que un identificador mal formado se traduzca en una respuesta de error.
 GET {{baseUrl}}/12345-id-invalido

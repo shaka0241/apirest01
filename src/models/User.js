@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Esquema de usuario disponible para ampliar la API; actualmente no hay rutas de usuarios.
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -20,7 +21,9 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
   },
+  // Mantiene fechas de creación y modificación sin exponer el contador interno __v.
   { timestamps: true, versionKey: false },
 );
 
+// Mongoose usa el modelo para validar y consultar documentos de usuario.
 module.exports = mongoose.model("User", userSchema);

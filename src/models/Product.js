@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// El esquema define los campos, tipos y reglas que debe cumplir cada producto.
 const productSchema = new mongoose.Schema(
   {
     name: {
@@ -27,7 +28,9 @@ const productSchema = new mongoose.Schema(
       enum: ["hardware", "perifericos", "software", "accesorios"],
     },
   },
+  // Mongoose agrega createdAt/updatedAt y omite el campo interno __v.
   { timestamps: true, versionKey: false },
 );
 
+// El modelo conecta este esquema con la colección de productos de MongoDB.
 module.exports = mongoose.model("Product", productSchema);

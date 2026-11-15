@@ -1,3 +1,4 @@
+// Carga las variables de entorno definidas en .env antes de configurar la aplicación.
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -5,16 +6,18 @@ const connectDB = require("./src/config/db");
 const productRoutes = require("./src/routes/productRoutes");
 const { notFound, errorHandler } = require("./src/middlewares/errorMiddleware");
 
+// Crea la aplicación de Express; en este archivo se conectan sus piezas principales.
 const app = express();
 
-// Conectar a MongoDB Atlas
+// Inicia la conexión a la base de datos usando la configuración del entorno.
 connectDB();
 
-// Middlewares globales
+// Los middlewares procesan cada petición antes de que llegue a una ruta.
+// CORS permite solicitudes desde otros orígenes y express.json interpreta cuerpos JSON.
 app.use(cors());
 app.use(express.json());
 
-// Ruta raíz informativa para comprobar que la API vive en Vercel
+// Endpoint de comprobación: informa que el servidor está activo y qué recurso ofrece.
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -25,14 +28,16 @@ app.get("/", (req, res) => {
   });
 });
 
-// Rutas de la API
+// Todas las rutas de productos quedan agrupadas bajo el prefijo /api/products.
 app.use("/api/products", productRoutes);
 
-// Middlewares de gestión de errores (SIEMPRE después de las rutas)
+// Se colocan después de las rutas: primero se detectan endpoints inexistentes
+// y luego se centraliza el tratamiento de los errores enviados con next(error).
 app.use(notFound);
 app.use(errorHandler);
 
-// Arranque del servidor en local
+// En desarrollo se inicia un servidor HTTP local; en producción la plataforma
+// (por ejemplo, Vercel) importa y ejecuta la aplicación exportada más abajo.
 const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
@@ -40,5 +45,5 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// Exportación obligatoria para el despliegue en Vercel
+// Exporta la aplicación para que otros procesos o la plataforma de despliegue la usen.
 module.exports = app;

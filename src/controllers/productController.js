@@ -1,7 +1,10 @@
 const Product = require("../models/Product");
 const User = require("../models/User"); // Importado para registrar ambos modelos en Mongoose
 
-// 1. GET /api/products - Obtener todos los productos
+// Los controladores implementan cada operación HTTP y traducen su resultado a JSON.
+// Los errores de Mongoose se pasan al middleware central mediante next(error).
+
+// GET /api/products: devuelve todos los productos, del más reciente al más antiguo.
 const getAllProducts = async (req, res, next) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
@@ -15,7 +18,7 @@ const getAllProducts = async (req, res, next) => {
   }
 };
 
-// 2. GET /api/products/:id - Obtener un producto por ID
+// GET /api/products/:id: busca un producto por el identificador de MongoDB.
 const getProductById = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -34,7 +37,7 @@ const getProductById = async (req, res, next) => {
   }
 };
 
-// 3. POST /api/products - Crear un nuevo producto
+// POST /api/products: crea un producto con los datos enviados en el cuerpo JSON.
 const createProduct = async (req, res, next) => {
   try {
     const newProduct = await Product.create(req.body);
@@ -48,7 +51,7 @@ const createProduct = async (req, res, next) => {
   }
 };
 
-// 4. PUT /api/products/:id - Actualizar un producto existente
+// PUT /api/products/:id: actualiza los campos enviados y devuelve el documento nuevo.
 const updateProduct = async (req, res, next) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -74,7 +77,7 @@ const updateProduct = async (req, res, next) => {
   }
 };
 
-// 5. DELETE /api/products/:id - Eliminar un producto
+// DELETE /api/products/:id: elimina el producto y devuelve el documento eliminado.
 const deleteProduct = async (req, res, next) => {
   try {
     const deletedProduct = await Product.findByIdAndDelete(req.params.id);
@@ -96,6 +99,7 @@ const deleteProduct = async (req, res, next) => {
   }
 };
 
+// Exporta los controladores para que el router los asocie con sus endpoints.
 module.exports = {
   getAllProducts,
   getProductById,
