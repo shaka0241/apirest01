@@ -1,5 +1,5 @@
-@baseUrl = https://apirest01.vercel.app/api/products
-@productId = 6af8a723ac104744083b6f07
+@baseUrl = {{$dotenv API_URL}}
+@productId = 6af9e3704de152f49a042297
 
 ### 1. Crear un nuevo producto (POST)
 POST {{baseUrl}}
