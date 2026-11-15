@@ -1,0 +1,40 @@
+@baseUrl = https://apirest01.vercel.app/api/products
+@productId = 6af8a723ac104744083b6f07
+
+### 1. Crear un nuevo producto (POST)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "Monitor Gaming 27 Pulgadas",
+  "description": "Panel IPS 165Hz 1ms QHD",
+  "price": 249.99,
+  "stock": 15,
+  "category": "perifericos"
+}
+
+### 2. Obtener todos los productos (GET)
+GET {{baseUrl}}
+Accept: application/json
+
+### 3. Obtener un producto concreto por ID (GET)
+GET {{baseUrl}}/{{productId}}
+Accept: application/json
+
+### 4. Actualizar un producto existente (PUT)
+PUT {{baseUrl}}/{{productId}}
+Content-Type: application/json
+
+{
+  "price": 219.99,
+  "stock": 10
+}
+
+### 5. Eliminar un producto (DELETE)
+DELETE {{baseUrl}}/{{productId}}
+
+### 6. Prueba de Error 404 (Ruta inexistente)
+GET https://apirest01.vercel.app/api/ruta-falsa
+
+### 7. Prueba de Error 400/500 (ID con formato inválido)
+GET {{baseUrl}}/12345-id-invalido
