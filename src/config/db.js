@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 // Abre la conexión compartida de Mongoose con MongoDB Atlas.
 const connectDB = async () => {
@@ -17,4 +17,5 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+// Exportación por defecto: el archivo principal importa esta función para iniciar la conexión.
+export default connectDB;

@@ -1,10 +1,10 @@
-// Carga las variables de entorno definidas en .env antes de configurar la aplicación.
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const connectDB = require("./src/config/db");
-const productRoutes = require("./src/routes/productRoutes");
-const { notFound, errorHandler } = require("./src/middlewares/errorMiddleware");
+// Carga .env al importar este módulo, antes de leer MONGODB_URI o PORT.
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import connectDB from "./src/config/db.js";
+import productRoutes from "./src/routes/productRoutes.js";
+import { notFound, errorHandler } from "./src/middlewares/errorMiddleware.js";
 
 // Crea la aplicación de Express; en este archivo se conectan sus piezas principales.
 const app = express();
@@ -37,7 +37,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // En desarrollo se inicia un servidor HTTP local; en producción la plataforma
-// (por ejemplo, Vercel) importa y ejecuta la aplicación exportada más abajo.
+// (por ejemplo, Vercel) importa la exportación por defecto de este módulo.
 const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
@@ -45,5 +45,5 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// Exporta la aplicación para que otros procesos o la plataforma de despliegue la usen.
-module.exports = app;
+// La exportación por defecto permite que la plataforma de despliegue importe la aplicación.
+export default app;

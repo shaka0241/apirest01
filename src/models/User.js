@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 // Esquema de usuario disponible para ampliar la API; actualmente no hay rutas de usuarios.
 const userSchema = new mongoose.Schema(
@@ -25,5 +25,5 @@ const userSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false },
 );
 
-// Mongoose usa el modelo para validar y consultar documentos de usuario.
-module.exports = mongoose.model("User", userSchema);
+// Exportación por defecto para que futuras rutas puedan importar el modelo de usuario.
+export default mongoose.model("User", userSchema);

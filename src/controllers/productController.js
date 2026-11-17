@@ -1,5 +1,6 @@
-const Product = require("../models/Product");
-const User = require("../models/User"); // Importado para registrar ambos modelos en Mongoose
+import Product from "../models/Product.js";
+// Importar el modelo lo registra en Mongoose, aunque este controlador aún no gestione usuarios.
+import "../models/User.js";
 
 // Los controladores implementan cada operación HTTP y traducen su resultado a JSON.
 // Los errores de Mongoose se pasan al middleware central mediante next(error).
@@ -99,8 +100,8 @@ const deleteProduct = async (req, res, next) => {
   }
 };
 
-// Exporta los controladores para que el router los asocie con sus endpoints.
-module.exports = {
+// Exportaciones con nombre: el router importa explícitamente cada controlador que utiliza.
+export {
   getAllProducts,
   getProductById,
   createProduct,

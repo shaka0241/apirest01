@@ -1,13 +1,13 @@
-const express = require("express");
-const router = express.Router();
-// El router asocia los verbos y segmentos URL con las funciones de los controladores.
-const {
+import express from "express";
+import {
   getAllProducts,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
-} = require("../controllers/productController");
+} from "../controllers/productController.js";
+
+const router = express.Router();
 
 // Al montarse en /api/products, "/" corresponde a /api/products y "/:id"
 // captura el identificador enviado en la URL.
@@ -17,5 +17,5 @@ router.post("/", createProduct);
 router.put("/:id", updateProduct);
 router.delete("/:id", deleteProduct);
 
-// El archivo principal monta este router bajo el prefijo /api/products.
-module.exports = router;
+// Exportación por defecto: el archivo principal importa este router y lo monta en /api/products.
+export default router;

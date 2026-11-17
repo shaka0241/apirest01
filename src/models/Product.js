@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 // El esquema define los campos, tipos y reglas que debe cumplir cada producto.
 const productSchema = new mongoose.Schema(
@@ -32,5 +32,5 @@ const productSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false },
 );
 
-// El modelo conecta este esquema con la colección de productos de MongoDB.
-module.exports = mongoose.model("Product", productSchema);
+// Exportación por defecto del modelo que utilizan los controladores de productos.
+export default mongoose.model("Product", productSchema);

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arquitectura Express.js: Rutas, Controladores y Middlewares</title>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --primary: #38bdf8;
+      --accent: #4ade80;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --code-bg: #090d16;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .slides-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 4rem;
+    }
+    .slide {
+      display: none;
+      width: 100%;
+      max-width: 1150px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 3rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.08);
+      animation: fadeIn 0.35s ease;
+    }
+    .slide.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    h1 { font-size: 2.6rem; margin-bottom: 1rem; color: #fff; line-height: 1.2; }
+    h2 { font-size: 2rem; margin-bottom: 1.2rem; color: var(--primary); }
+    p { font-size: 1.15rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 1.2rem; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+      margin-top: 1.5rem;
+      align-items: start;
+    }
+    .box {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 1.4rem;
+      border-radius: 12px;
+      border-left: 4px solid var(--primary);
+    }
+    .box.green { border-left-color: var(--accent); }
+    .box.yellow { border-left-color: var(--warning); }
+    .box.red { border-left-color: var(--danger); }
+    .box h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: #fff; }
+    .box p { font-size: 1rem; margin-bottom: 0; }
+    pre {
+      background: var(--code-bg);
+      padding: 1.3rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: #e2e8f0;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .kw { color: #c678dd; }
+    .fn { color: #61afef; }
+    .str { color: #98c379; }
+    .cm { color: #5c6370; font-style: italic; }
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.7rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    .flow-step {
+      flex: 1;
+      min-width: 140px;
+      background: var(--code-bg);
+      padding: 1.2rem 1rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .flow-step strong { display: block; color: var(--primary); margin-bottom: 0.4rem; font-size: 1.05rem; }
+    .flow-step span { font-size: 0.88rem; color: var(--text-muted); }
+    .arrow { font-size: 1.6rem; color: var(--accent); font-weight: bold; }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 4rem;
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    button {
+      background: var(--primary);
+      color: #0f172a;
+      border: none;
+      padding: 0.65rem 1.4rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    button:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+    .counter { font-weight: 600; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <div class="slides-container">
+    <!-- LÁMINA 1 -->
+    <div class="slide active">
+      <span class="badge">Módulo Backend MERN • Lámina 1 / 7</span>
+      <h1>Arquitectura de una API REST con Express.js</h1>
+      <p>Cómo organizar un servidor profesional separando <strong>Rutas</strong>, <strong>Controladores</strong> y <strong>Middlewares</strong>.</p>
+      <div class="grid-2">
+        <div class="box">
+          <h3>🍽️ La Analogía del Restaurante</h3>
+          <p>• <strong>Express:</strong> El local y su infraestructura.<br>
+             • <strong>Rutas:</strong> El recepcionista con la carta en la puerta.<br>
+             • <strong>Controladores:</strong> Los chefs que cocinan el pedido.<br>
+             • <strong>Modelos (Mongoose):</strong> La despensa de datos (Atlas).<br>
+             • <strong>Middlewares:</strong> El equipo de seguridad y control de calidad.</p>
+        </div>
+        <div class="box green">
+          <h3>🎯 Objetivo de la Arquitectura</h3>
+          <p>Evitar el "código espagueti" en un solo archivo. Cada carpeta tiene una <strong>única responsabilidad</strong> para que el código sea limpio, escalable y fácil de mantener.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LÁMINA 2 -->
+    <div class="slide">
+      <span class="badge">Concepto Base • Lámina 2 / 7</span>
+      <h2>1. ¿Qué es Express.js?</h2>
+      <p>Es el framework minimalista para <strong>Node.js</strong> que gestiona la comunicación HTTP entre el cliente (Frontend / Postman / Thunder Client) y nuestro servidor.</p>
+      <div class="grid-2">
+        <div>
+          <div class="box" style="margin-bottom: 1rem;">
+            <h3>📥 Request (req) — Lo que entra</h3>
+            <p>Contiene los datos que envía el usuario: parámetros en la URL (<code>req.params</code>), cuerpo JSON (<code>req.body</code>) o cabeceras.</p>
+          </div>
+          <div class="box green">
+            <h3>📤 Response (res) — Lo que sale</h3>
+            <p>Devuelve al cliente un código de estado HTTP (<code>200</code>, <code>201</code>, <code>404</code>, <code>500</code>) y una respuesta clara en formato JSON.</p>
+          </div>
+        </div>
+        <pre><span class="kw">const</span> express = <span class="fn">require</span>(<span class="str">'express'</span>);
+<span class="kw">const</span> app = <span class="fn">express</span>();
+
+<span class="cm">// Middleware global: transforma el body</span>
+<span class="cm">// entrante en un objeto JSON utilizable</span>
+app.<span class="fn">use</span>(express.<span class="fn">json</span>());
+
+app.<span class="fn">get</span>(<span class="str">'/'</span>, (req, res) => {
+  res.<span class="fn">status</span>(200).<span class="fn">json</span>({
+    success: <span class="kw">true</span>,
+    message: <span class="str">'API operativa'</span>
+  });
+});</pre>
+      </div>
+    </div>
+
+    <!-- LÁMINA 3 -->
+    <div class="slide">
+      <span class="badge">Organización • Lámina 3 / 7</span>
+      <h2>2. Separación de Responsabilidades</h2>
+      <p>En lugar de escribir todo en <code>index.js</code>, dividimos el backend en carpetas independientes:</p>
+      <div class="grid-2">
+        <div class="box">
+          <h3>📁 src/routes/</h3>
+          <p><strong>Solo dirige el tráfico.</strong> Conecta cada endpoint y verbo HTTP con su controlador. Prohibido hacer consultas a MongoDB aquí.</p>
+        </div>
+        <div class="box green">
+          <h3>📁 src/controllers/</h3>
+          <p><strong>Contiene la lógica.</strong> Recibe la petición, llama al modelo de Mongoose y devuelve el JSON o envía el error a <code>next(error)</code>.</p>
+        </div>
+        <div class="box yellow">
+          <h3>📁 src/models/</h3>
+          <p><strong>Define los datos.</strong> Esquemas de Mongoose con tipos de datos y reglas de validación (<code>required</code>, <code>min</code>, <code>enum</code>).</p>
+        </div>
+        <div class="box red">
+          <h3>📁 src/middlewares/</h3>
+          <p><strong>Protege el servidor.</strong> Captura rutas que no existen (404) y centraliza todos los errores (500) sin que la app se caiga.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LÁMINA 4 -->
+    <div class="slide">
+      <span class="badge">Capa 1 • Lámina 4 / 7</span>
+      <h2>3. Las Rutas (Routes): El Mapa de Endpoints</h2>
+      <p>Las rutas leen el <strong>Verbo HTTP</strong> + la <strong>URL</strong> y ejecutan la función correspondiente del controlador.</p>
+      <div class="grid-2">
+        <pre><span class="cm">// src/routes/productRoutes.js</span>
+<span class="kw">const</span> express = <span class="fn">require</span>(<span class="str">'express'</span>);
+<span class="kw">const</span> router = express.<span class="fn">Router</span>();
+<span class="kw">const</span> {
+  getAllProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct
+} = <span class="fn">require</span>(<span class="str">'../controllers/productController'</span>);
+
+router.<span class="fn">get</span>(<span class="str">'/'</span>, getAllProducts);
+router.<span class="fn">get</span>(<span class="str">'/:id'</span>, getProductById);
+router.<span class="fn">post</span>(<span class="str">'/'</span>, createProduct);
+router.<span class="fn">put</span>(<span class="str">'/:id'</span>, updateProduct);
+router.<span class="fn">delete</span>(<span class="str">'/:id'</span>, deleteProduct);
+
+module.exports = router;</pre>
+        <div>
+          <div class="box" style="margin-bottom: 1rem;">
+            <h3>✅ Buenas Prácticas REST</h3>
+            <p>• <strong>GET</strong> <code>/api/products</code> → Listar todos<br>
+               • <strong>GET</strong> <code>/api/products/:id</code> → Obtener uno<br>
+               • <strong>POST</strong> <code>/api/products</code> → Crear nuevo<br>
+               • <strong>PUT</strong> <code>/api/products/:id</code> → Actualizar<br>
+               • <strong>DELETE</strong> <code>/api/products/:id</code> → Eliminar</p>
+          </div>
+          <div class="box yellow">
+            <h3>💡 Regla de Oro</h3>
+            <p>Un archivo de rutas limpio se lee como un índice: cero lógica de base de datos, cero bloques <code>try/catch</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LÁMINA 5 -->
+    <div class="slide">
+      <span class="badge">Capa 2 • Lámina 5 / 7</span>
+      <h2>4. Los Controladores (Controllers): El Cerebro</h2>
+      <p>Son funciones asíncronas (<code>async/await</code>) que procesan la petición, consultan MongoDB Atlas y devuelven una respuesta JSON coherente.</p>
+      <div class="grid-2">
+        <pre><span class="cm">// src/controllers/productController.js</span>
+<span class="kw">const</span> Product = <span class="fn">require</span>(<span class="str">'../models/Product'</span>);
+
+<span class="kw">const</span> <span class="fn">createProduct</span> = <span class="kw">async</span> (req, res, next) => {
+  <span class="kw">try</span> {
+    <span class="cm">// 1. Crea documento en Atlas con req.body</span>
+    <span class="kw">const</span> saved = <span class="kw">await</span> Product.<span class="fn">create</span>(req.body);
+
+    <span class="cm">// 2. Responde con código 201 y JSON</span>
+    res.<span class="fn">status</span>(201).<span class="fn">json</span>({
+      success: <span class="kw">true</span>,
+      data: saved
+    });
+  } <span class="kw">catch</span> (error) {
+    <span class="cm">// 3. Delega cualquier fallo al Middleware 500</span>
+    <span class="fn">next</span>(error);
+  }
+};</pre>
+        <div>
+          <div class="box green" style="margin-bottom: 1rem;">
+            <h3>🔍 ¿Qué hace el Controlador?</h3>
+            <p>1. Extrae datos de <code>req.params</code> o <code>req.body</code>.<br>
+               2. Ejecuta métodos de Mongoose (<code>find</code>, <code>findById</code>, <code>create</code>...).<br>
+               3. Verifica si el recurso existe (si no, devuelve <code>404</code>).</p>
+          </div>
+          <div class="box red">
+            <h3>⚡ ¿Por qué usamos next(error)?</h3>
+            <p>En lugar de repetir respuestas de error en cada función, <code>next(error)</code> envía el fallo directamente al manejador centralizado 500.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LÁMINA 6 -->
+    <div class="slide">
+      <span class="badge">Capa 3 • Lámina 6 / 7</span>
+      <h2>5. Los Middlewares: Guardianes de la API</h2>
+      <p>Funciones intermedias que interceptan la petición. En nuestra API destacan los dos middlewares de cierre para gestionar errores:</p>
+      <div class="grid-2">
+        <pre><span class="cm">// src/middlewares/errorMiddleware.js</span>
+
+<span class="cm">// 1. Middleware 404 (3 parámetros)</span>
+<span class="kw">const</span> <span class="fn">notFound</span> = (req, res, next) => {
+  res.<span class="fn">status</span>(404).<span class="fn">json</span>({
+    success: <span class="kw">false</span>,
+    message: <span class="str">`No existe: ${req.originalUrl}`</span>
+  });
+};
+
+<span class="cm">// 2. Middleware 500 (4 parámetros OBLIGATORIOS)</span>
+<span class="kw">const</span> <span class="fn">errorHandler</span> = (err, req, res, next) => {
+  res.<span class="fn">status</span>(500).<span class="fn">json</span>({
+    success: <span class="kw">false</span>,
+    error: <span class="str">'Error del servidor'</span>,
+    message: err.message
+  });
+};</pre>
+        <div>
+          <div class="box yellow" style="margin-bottom: 1rem;">
+            <h3>⚠️ El Orden Importa en index.js</h3>
+            <p>1º <code>app.use(express.json())</code><br>
+               2º <code>app.use('/api/products', productRoutes)</code><br>
+               3º <code>app.use(notFound)</code> (404)<br>
+               4º <code>app.use(errorHandler)</code> (500)</p>
+          </div>
+          <div class="box red">
+            <h3>🔑 Detalle de Examen</h3>
+            <p>Express reconoce un middleware de error exclusivamente porque tiene <strong>4 argumentos</strong>: <code>(err, req, res, next)</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LÁMINA 7 -->
+    <div class="slide">
+      <span class="badge">Flujo Completo • Lámina 7 / 7</span>
+      <h2>6. El Viaje de una Petición de Principio a Fin</h2>
+      <p>¿Qué ocurre internamente cuando lanzamos una petición desde Thunder Client o Postman?</p>
+      <div class="flow-diagram">
+        <div class="flow-step">
+          <strong>1. Cliente HTTP</strong>
+          <span>Envía petición<br><code>POST /api/products</code></span>
+        </div>
+        <span class="arrow">➔</span>
+        <div class="flow-step">
+          <strong>2. Middleware</strong>
+          <span><code>express.json()</code><br>lee el Body</span>
+        </div>
+        <span class="arrow">➔</span>
+        <div class="flow-step">
+          <strong>3. Router</strong>
+          <span>Busca la ruta<br>(o salta al 404)</span>
+        </div>
+        <span class="arrow">➔</span>
+        <div class="flow-step">
+          <strong>4. Controller</strong>
+          <span>Llama al Modelo<br>en MongoDB Atlas</span>
+        </div>
+        <span class="arrow">➔</span>
+        <div class="flow-step">
+          <strong>5. Respuesta</strong>
+          <span>JSON <code>201</code> o<br><code>next(err)</code> al 500</span>
+        </div>
+      </div>
+      <div class="box green" style="margin-top: 2rem;">
+        <h3>🚀 Resultado para la Entrega</h3>
+        <p>Una API modular donde las rutas dirigen, los controladores ejecutan, Mongoose valida contra Atlas y los middlewares garantizan que el servidor siempre responda con un JSON limpio.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn" onclick="changeSlide(-1)" disabled>← Anterior</button>
+    <span class="counter" id="slideCounter">Lámina 1 de 7 (Usa las flechas ⬅ ➡ del teclado)</span>
+    <button id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const counter = document.getElementById('slideCounter');
+
+    function updateSlides() {
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentSlide);
+      });
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === slides.length - 1;
+      counter.textContent = `Lámina ${currentSlide + 1} de ${slides.length} (Usa las flechas ⬅ ➡ del teclado)`;
+    }
+
+    function changeSlide(direction) {
+      const nextIndex = currentSlide + direction;
+      if (nextIndex >= 0 && nextIndex < slides.length) {
+        currentSlide = nextIndex;
+        updateSlides();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') changeSlide(1);
+      if (e.key === 'ArrowLeft') changeSlide(-1);
+    });
+  </script>
+</body>
+</html>

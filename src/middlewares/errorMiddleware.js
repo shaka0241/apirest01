@@ -38,5 +38,5 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-// Express reconoce el middleware de errores por sus cuatro parámetros.
-module.exports = { notFound, errorHandler };
+// Exportaciones con nombre para que la aplicación monte ambos middlewares en el orden correcto.
+export { notFound, errorHandler };
